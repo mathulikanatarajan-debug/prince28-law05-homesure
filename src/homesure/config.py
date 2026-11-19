@@ -4,7 +4,10 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Literal
 
+from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+from homesure.db.url import to_asyncpg_url
 
 
 class Settings(BaseSettings):
@@ -15,10 +18,17 @@ class Settings(BaseSettings):
     )
 
     app_name: str = "homesure"
-    # No default on purpose: if APP_ENV is missing, the app refuses to start.
     app_env: Literal["local", "ci", "production"]
+    database_url: str
     log_level: Literal["DEBUG", "INFO", "WARNING", "ERROR"] = "INFO"
     data_file: Path = Path("data/sample_records.json")
+    db_pool_size: int = 5
+    db_max_overflow: int = 5
+
+    @field_validator("database_url")
+    @classmethod
+    def _asyncpg(cls, value: str) -> str:
+        return to_asyncpg_url(value)
 
 
 @lru_cache
