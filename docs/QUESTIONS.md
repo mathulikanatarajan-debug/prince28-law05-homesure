@@ -30,4 +30,3 @@ Are there any complaints, disputes, or regulatory orders related to the project?
 
 ## 10. Project Health
 Based on registration, completion, complaints, and regulatory orders, what is the overall project status?
-
