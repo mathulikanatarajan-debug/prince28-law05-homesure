@@ -2,12 +2,12 @@
 
 import logging
 
-from homesure.config import get_settings
+from homesure.config import Settings, get_settings
 
 
-def setup_logging() -> None:
+def setup_logging(settings: Settings | None = None) -> None:
     """Set the logging level and format."""
-    settings = get_settings()
+    settings = settings or get_settings()
 
     logging.basicConfig(
         level=settings.log_level,
