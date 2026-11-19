@@ -3,7 +3,7 @@
         "id": "001",
         "project_reg_no": "TN/35/Building/0185/2025",
         "promoter": "M/s. PBEL PROPERTY DEVELOPMENT INDIA PVT LTD",
-        "location": "Chennai, Chengalpattu, Tamil Nadu",
+       "location": "Chennai, Chengalpattu, Tamil Nadu",
         "completion_date": "Sep 2030",
         "carpet_area": null,
         "complaint_outcome": null
@@ -44,6 +44,141 @@
     "completion_date": "31.10.2028",
     "carpet_area": null,
     "complaint_outcome": null
-  }
+  },
 
+  {
+    "id": "006",
+    "project_reg_no": "TN/11/Building/0072/2025",
+    "promoter": "M/s. TNCD LLP",
+    "location": "Kalapatti Village, Coimbatore North Taluk, Coimbatore District, Tamil Nadu",
+    "completion_date": null,
+    "carpet_area": null,
+    "complaint_outcome": null
+  },
+  {
+    "id": "007",
+    "project_reg_no": "TN/11/Building/0202/2025",
+    "promoter": "M/s. Renaatus Projects Private Limited",
+    "location": "Vilankurichi Village, Coimbatore District, Tamil Nadu",
+    "completion_date": null,
+    "carpet_area": null,
+    "complaint_outcome": null
+  },
+  {
+    "id": "008",
+    "project_reg_no": "TN/11/Building/0058/2025",
+    "promoter": null,
+    "location": "Sulur Village, Sulur Taluk, Coimbatore District, Tamil Nadu",
+    "completion_date": null,
+    "carpet_area": null,
+    "complaint_outcome": null
+  },
+  {
+    "id": "009",
+    "project_reg_no": "TN/11/Building/0222/2025",
+    "promoter": "M/s. Dhiya Foundation Pvt Ltd",
+    "location": "Ganapathy Village, Coimbatore North Taluk, Coimbatore District, Tamil Nadu",
+    "completion_date": null,
+    "carpet_area": null,
+    "complaint_outcome": null
+  },
+  {
+    "id": "010",
+    "project_reg_no": "TN/11/Building/0246/2025",
+    "promoter": "M/s. Dhiya Foundation Private Limited",
+    "location": "Sanganur Village, Coimbatore District, Tamil Nadu",
+    "completion_date": null,
+    "carpet_area": null,
+    "complaint_outcome": null
+  },
+  {
+    "id": "011",
+    "project_reg_no": "TN/29/Building/0123/2025",
+    "promoter": "M/s. NIRMAL PROJECTSS",
+    "location": "Pallikaranai, Chennai District, Tamil Nadu",
+    "completion_date": null,
+    "carpet_area": null,
+    "complaint_outcome": null
+  },
+  {
+    "id": "012",
+    "project_reg_no": "TN/29/Building/0238/2025",
+    "promoter": "M/s. Raunaq Foundations",
+    "location": "Zamin Pallavaram, Pallavaram Taluk, Chennai District, Tamil Nadu",
+    "completion_date": null,
+    "carpet_area": null,
+    "complaint_outcome": null
+  },
+  {
+    "id": "013",
+    "project_reg_no": "TN/29/Building/0129/2025",
+    "promoter": null,
+    "location": "Karapakkam, Chennai District, Tamil Nadu",
+    "completion_date": null,
+    "carpet_area": null,
+    "complaint_outcome": null
+  },
+  {
+    "id": "014",
+    "project_reg_no": "TN/29/Building/0054/2025",
+    "promoter": null,
+    "location": "Okkiyam Thoraipakkam, Chennai, Tamil Nadu",
+    "completion_date": null,
+    "carpet_area": null,
+    "complaint_outcome": null
+  },
+  {
+    "id": "015",
+    "project_reg_no": "TN/29/Building/0213/2025",
+    "promoter": null,
+    "location": "Nungambakkam, Chennai District, Tamil Nadu",
+    "completion_date": null,
+    "carpet_area": null,
+    "complaint_outcome": null
+  },
+  {
+    "id": "016",
+    "project_reg_no": "TN/29/Building/0196/2025",
+    "promoter": null,
+    "location": "Egmore, Chennai District, Tamil Nadu",
+    "completion_date": null,
+    "carpet_area": null,
+    "complaint_outcome": null
+  },
+  {
+    "id": "017",
+    "project_reg_no": "TN/35/Building/0169/2025",
+    "promoter": null,
+    "location": "Kanathur Reddikuppam Village, Thiruporur Taluk, Chengalpattu District, Tamil Nadu",
+    "completion_date": null,
+    "carpet_area": null,
+    "complaint_outcome": null
+  },
+  {
+    "id": "018",
+    "project_reg_no": "TN/7/Building/0191/2025",
+    "promoter": "K M PONNAMPOOSARI",
+    "location": "Mitta Ayyamperumampatti Village, Salem Taluk, Salem District, Tamil Nadu",
+    "completion_date": null,
+    "carpet_area": null,
+    "complaint_outcome": null
+  },
+  {
+    "id": "019",
+    "project_reg_no": "TNRERA/11/BLG/0308/2025",
+    "promoter": "Intermont Life",
+    "location": "Coimbatore, Tamil Nadu",
+    "completion_date": null,
+    "carpet_area": null,
+    "complaint_outcome": null
+  },
+  {
+    "id": "020",
+    "project_reg_no": "TN/11/Building/0241/2025",
+    "promoter": "Infinium Realty Coimbatore",
+    "location": "Coimbatore, Tamil Nadu",
+    "completion_date": "2027-11-30",
+    "carpet_area": null,
+    "complaint_outcome": null
+  }
 ]
