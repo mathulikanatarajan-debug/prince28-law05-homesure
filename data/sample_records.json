@@ -1,0 +1,49 @@
+[
+    {
+        "id": "001",
+        "project_reg_no": "TN/35/Building/0185/2025",
+        "promoter": "M/s. PBEL PROPERTY DEVELOPMENT INDIA PVT LTD",
+        "location": "Chennai, Chengalpattu, Tamil Nadu",
+        "completion_date": "Sep 2030",
+        "carpet_area": null,
+        "complaint_outcome": null
+    },
+    {
+        "id": "002",
+        "project_reg_no": "TN/01/Layout/2593/2022",
+        "promoter": "Thiru. M.R. Chandrasekar",
+        "location": "Kalvoy, Kancheepuram, Tamil Nadu",
+        "completion_date": null,
+        "carpet_area": null,
+        "complaint_outcome": null
+    },
+    {
+        "id": "003",
+        "project_reg_no": "TNRERA/1/LO/3802/2025",
+        "promoter": "Urban Tree Infrastructures Pvt Ltd & Amberland Promoters Pvt Ltd",
+        "location": "Kundrathur B Village, Kancheepuram, Tamil Nadu",
+        "completion_date": null,
+        "carpet_area": null,
+        "complaint_outcome": null
+    },
+
+  {
+    "id": "004",
+    "project_reg_no": "TNRERA/29/BLG/0378/2026",
+    "promoter": "Sreejee Construction P LTD",
+    "location": "Nanganallur, Chennai, Tamil Nadu",
+    "completion_date": "27.07.2028",
+    "carpet_area": null,
+    "complaint_outcome": null
+  },
+  {
+    "id": "005",
+    "project_reg_no": "TNRERA/29/BLG/0384/2026",
+    "promoter": "Anmol Shrusti Contractors And Engineers Private Limited",
+    "location": "Thiruvanmiyur, Chennai, Tamil Nadu",
+    "completion_date": "31.10.2028",
+    "carpet_area": null,
+    "complaint_outcome": null
+  }
+
+]
