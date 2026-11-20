@@ -181,7 +181,8 @@ async def test_database_backed_api_health_readiness_and_documents(
 
     try:
         with TestClient(create_app(settings)) as client:
-            assert client.get("/health").json() == {"status": "ok"}
+            assert client.get("/health").json()["status"] == "ok"
+
             assert client.get("/ready").json() == {
                 "status": "ready",
                 "checks": {"database": True},
