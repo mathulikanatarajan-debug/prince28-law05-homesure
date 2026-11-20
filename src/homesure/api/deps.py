@@ -1,10 +1,12 @@
 """Shared API dependencies."""
 
 from collections.abc import AsyncIterator
+from typing import Annotated
 
-from fastapi import HTTPException, Request
+from fastapi import Depends, HTTPException, Request
 from sqlalchemy import text
 
+from homesure.config import Settings, get_settings
 from homesure.db.repository import DocumentRepository
 from homesure.db.session import make_sessionmaker
 from homesure.store import get_document, load_documents
@@ -41,3 +43,7 @@ async def check_db(request: Request) -> bool:
         return True
     except Exception as exc:
         raise HTTPException(status_code=503, detail="Database unavailable") from exc
+
+
+SettingsDep = Annotated[Settings, Depends(get_settings)]
+DbCheckDep = Annotated[bool, Depends(check_db)]
