@@ -98,3 +98,56 @@ Run lint and formatting checks with:
 ```powershell
 uv run poe lint
 ```
+
+## Run locally
+
+### Prerequisites
+
+- Python 3.12+
+- uv
+- Docker Desktop with Docker Compose
+
+### Start the application
+
+From the repository root:
+
+```bash
+docker compose up --build -d
+```
+
+The API is available at:
+
+- Health: http://localhost:8001/health
+- Readiness: http://localhost:8001/ready
+
+### Run tests
+
+Run unit tests:
+
+```bash
+uv run poe test
+```
+
+Run integration tests using the test database:
+
+```bash
+uv run poe test-integration
+```
+
+Run all tests with coverage:
+
+```bash
+uv run poe cov
+```
+
+Run lint checks:
+
+```bash
+uv run poe lint
+```
+
+### Stop the services
+
+```bash
+docker compose down
+```
