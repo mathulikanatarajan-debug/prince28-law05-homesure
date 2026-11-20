@@ -1,37 +1,51 @@
 """Document API routes."""
 
-from fastapi import APIRouter, HTTPException, Query, Request
+from typing import Annotated
+
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
+
+from homesure.api.deps import get_repo
+from homesure.db.repository import DocumentRepository
 
 router = APIRouter(prefix="/v1/documents", tags=["documents"])
 
 
 @router.get("")
-def list_documents(
+async def list_documents(
     request: Request,
+    repo: Annotated[DocumentRepository, Depends(get_repo)],
     q: str | None = None,
-    limit: int = Query(default=10, ge=1, le=100),
+    limit: Annotated[int, Query(ge=1, le=100)] = 10,
+    offset: Annotated[int, Query(ge=0)] = 0,
 ) -> dict:
-    """Return a limited list of documents."""
-    documents = request.app.state.documents or []
-    if q:
-        query = q.casefold()
-        documents = [
-            document for document in documents if query in str(document.get("title", "")).casefold()
-        ]
-    return {"total": len(documents), "items": documents[:limit]}
+    """Return documents with search, filters and pagination."""
+    filters = {
+        key: value
+        for key, value in request.query_params.items()
+        if key not in {"q", "limit", "offset"}
+    }
+
+    for key in filters:
+        if not key.replace("_", "").isalnum() or not key[0].isalpha():
+            raise HTTPException(status_code=400, detail="Invalid filter name")
+
+    total, items = await repo.list(
+        q=q,
+        filters=filters,
+        limit=limit,
+        offset=offset,
+    )
+
+    return {"total": total, "items": items, "filters": filters}
 
 
 @router.get("/{document_id}")
-def read_document(document_id: str, request: Request) -> dict:
+async def read_document(
+    document_id: str,
+    repo: Annotated[DocumentRepository, Depends(get_repo)],
+) -> dict:
     """Return one document by ID."""
-    document = next(
-        (
-            item
-            for item in (request.app.state.documents or [])
-            if str(item.get("id")) == document_id
-        ),
-        None,
-    )
+    document = await repo.get(document_id)
 
     if document is None:
         raise HTTPException(

@@ -1,6 +1,7 @@
 """Shared fixtures for API tests."""
 
 import pytest
+from fastapi import HTTPException
 from fastapi.testclient import TestClient
 
 from homesure.api.deps import check_db, get_repo
@@ -55,7 +56,13 @@ def db_state():
 def client(settings, db_state):
     app = create_app(settings)
     app.dependency_overrides[get_repo] = lambda: FakeRepo(SAMPLE)
-    app.dependency_overrides[check_db] = lambda: db_state["up"]
+
+    async def fake_check_db():
+        if not db_state["up"]:
+            raise HTTPException(status_code=503, detail="Database unavailable")
+        return True
+
+    app.dependency_overrides[check_db] = fake_check_db
 
     with TestClient(app) as test_client:
         yield test_client

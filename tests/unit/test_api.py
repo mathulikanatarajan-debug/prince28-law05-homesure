@@ -1,5 +1,10 @@
 """Unit tests for the HomeSure API."""
 
+from fastapi.testclient import TestClient
+
+from homesure.api.main import create_app
+from homesure.config import Settings
+
 
 def test_health(client):
     response = client.get("/health")
@@ -14,6 +19,15 @@ def test_ready_database_up(client):
         "status": "ready",
         "checks": {"database": True},
     }
+
+
+def test_ready_database_unavailable(client, db_state):
+    db_state["up"] = False
+
+    response = client.get("/ready")
+
+    assert response.status_code == 503
+    assert response.json()["status"] == 503
 
 
 def test_list_documents(client):
@@ -93,3 +107,17 @@ def test_invalid_limit(client):
 def test_request_id_is_echoed(client):
     response = client.get("/health", headers={"X-Request-ID": "abc123"})
     assert response.headers["X-Request-ID"] == "abc123"
+
+
+def test_app_remains_available_when_json_file_is_missing(tmp_path, capsys):
+    settings = Settings(
+        app_env="ci",
+        database_url="postgresql://localhost/unused",
+        data_file=tmp_path / "missing.json",
+        _env_file=None,
+    )
+
+    with TestClient(create_app(settings)) as test_client:
+        assert test_client.get("/health").status_code == 200
+
+    assert "Could not load records" in capsys.readouterr().err
