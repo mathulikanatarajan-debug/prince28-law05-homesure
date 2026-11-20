@@ -1,3 +1,4 @@
+
 # syntax=docker/dockerfile:1
 FROM python:3.12-slim AS builder
 COPY --from=ghcr.io/astral-sh/uv:0.11.32 /uv /uvx /bin/
@@ -25,6 +26,12 @@ COPY --chown=app:app scripts ./scripts
 COPY --chown=app:app data ./data
 
 ENV PATH="/app/.venv/bin:$PATH" PYTHONUNBUFFERED=1 PYTHONDONTWRITEBYTECODE=1
+
+# CI passes the commit SHA, so /health can say exactly which version is live.
+# It comes last: a new SHA rebuilds only this tiny layer.
+ARG GIT_SHA=dev
+ENV GIT_SHA=${GIT_SHA}
+
 USER app
 EXPOSE 8000
 CMD ["sh", "-c", "exec uvicorn homesure.api.main:create_app --factory --host 0.0.0.0 --port ${PORT:-8000} --no-access-log"]

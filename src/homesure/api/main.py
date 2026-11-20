@@ -43,6 +43,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             await engine.dispose()
 
     app = FastAPI(title=settings.app_name, lifespan=lifespan)
+    app.dependency_overrides[get_settings] = lambda: settings
 
     app.middleware("http")(request_id_middleware)
 

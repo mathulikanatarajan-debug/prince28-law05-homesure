@@ -1,26 +1,26 @@
-"""Health and readiness endpoints."""
+from fastapi import APIRouter, Response
 
-from typing import Annotated
+from homesure.api.deps import DbCheckDep, SettingsDep
 
-from fastapi import APIRouter, Depends
-
-from homesure.api.deps import check_db
-
-router = APIRouter()
+router = APIRouter(tags=["health"])
 
 
 @router.get("/health")
-async def health() -> dict[str, str]:
-    """Basic application health check."""
-    return {"status": "ok"}
+def health(settings: SettingsDep) -> dict[str, str]:
+    """Liveness: is the process alive? Instant. Never touches the DB or the LLM."""
+    return {
+        "status": "ok",
+        "app": settings.app_name,
+        "env": settings.app_env,
+        "version": settings.git_sha,
+    }
 
 
 @router.get("/ready")
-async def ready(
-    database: Annotated[bool, Depends(check_db)],
-) -> dict[str, object]:
-    """Check whether the application is ready to serve requests."""
-    return {
-        "status": "ready",
-        "checks": {"database": database},
-    }
+async def ready(db_ok: DbCheckDep, response: Response) -> dict:
+    """Readiness: can this instance serve traffic right now?"""
+    checks = {"database": db_ok}
+    ok = all(checks.values())
+    if not ok:
+        response.status_code = 503
+    return {"status": "ready" if ok else "not_ready", "checks": checks}

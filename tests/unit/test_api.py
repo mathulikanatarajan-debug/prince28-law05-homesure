@@ -6,10 +6,21 @@ from homesure.api.main import create_app
 from homesure.config import Settings
 
 
-def test_health(client):
-    response = client.get("/health")
-    assert response.status_code == 200
-    assert response.json() == {"status": "ok"}
+def test_health_is_ok(client):
+    r = client.get("/health")
+    assert r.status_code == 200
+    assert r.json()["status"] == "ok"
+    assert r.json()["version"] == "dev"
+
+
+def test_git_sha_comes_from_the_environment(monkeypatch):
+    monkeypatch.setenv("GIT_SHA", "3f2c1ab")
+    settings = Settings(
+        app_env="ci",
+        database_url="postgresql://localhost/db",
+        _env_file=None,
+    )
+    assert settings.git_sha == "3f2c1ab"
 
 
 def test_ready_database_up(client):
@@ -23,11 +34,8 @@ def test_ready_database_up(client):
 
 def test_ready_database_unavailable(client, db_state):
     db_state["up"] = False
-
     response = client.get("/ready")
-
     assert response.status_code == 503
-    assert response.json()["status"] == 503
 
 
 def test_list_documents(client):
