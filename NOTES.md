@@ -1,163 +1,43 @@
-\# HomeSure — Database and Query Plan Notes
-
-
-
-\## 1. Database migrations
-
-
-
-Created the documents and pages tables using Alembic migrations.
-
-
-
-\- `5a3485f70471`: Create documents and pages.
-
-\- `59888dbfdaf5`: Add GIN index on metadata.
-
-\- Verified migration upgrade and downgrade successfully.
-
-
-
-\## 2. Database loader
-
-
-
-Tested the idempotent loader with 20 sample records.
-
-
-
-First run:
-
-\- Inserted: 20
-
-\- Updated: 0
-
-\- Unchanged: 0
-
-
-
-Second run:
-
-\- Inserted: 0
-
-\- Updated: 0
-
-\- Unchanged: 20
-
-
-
-After editing one record:
-
-\- Inserted: 0
-
-\- Updated: 1
-
-\- Unchanged: 19
-
-
-
-This confirms that the loader inserts new records, updates changed records, and skips unchanged records.
-
-
-
-\## 3. EXPLAIN ANALYZE
-
-
-
-Query tested:
-
-
-
-```sql
-
-SELECT id, title
-
-FROM documents
-
-WHERE metadata @> CAST(:f AS jsonb);
-
-```
-
-
-
-Metadata filter:
-
-
-
-`project\_reg\_no = TN/35/Building/0185/2025`
-
-
-
-\### Normal planner choice
-
-
-
-PostgreSQL selected:
-
-
-
-`Seq Scan on documents`
-
-
-
-It checked all 20 rows. For a small table, a sequential scan can be cheaper than using an index.
-
-
-
-\### Demonstrating GIN index usage
-
-
-
-After executing:
-
-
-
-```sql
-
-SET enable\_seqscan = off;
-
-```
-
-
-
-PostgreSQL selected:
-
-
-
-\- `Bitmap Heap Scan on documents`
-
-\- `Bitmap Index Scan on ix\_documents\_metadata\_gin`
-
-
-
-This confirms that the GIN index supports the JSONB containment operator `@>`.
-
-
-
-\## 4. Why does PostgreSQL choose Seq Scan?
-
-
-
-The query planner estimates the cost of different execution plans. Since this table contains only 20 records, reading the whole table can be cheaper than accessing the index and then fetching matching rows.
-
-
-
-As the table grows, and when the filter is selective enough, PostgreSQL may choose the GIN index automatically.
-
-
-
-Disabling sequential scans was only a demonstration to prove that the index can be used. It is not a recommended production setting.
-
-
-
-\## 5. Conclusion
-
-
-
-\- Alembic migrations were tested.
-
-\- The database loader was verified as idempotent.
-
-\- API tests and lint checks passed.
-
-\- The GIN index was verified using EXPLAIN ANALYZE.
+# Day 4 verification evidence
+
+## Docker and Compose
+
+- `docker compose up --build -d` completed successfully and built `homesure-api`
+  and `homesure-migrate`.
+- `docker image inspect homesure-api:latest` returned image ID
+  `sha256:c370d24e856cf711485d9ae58cc5e5a49426d8a2f697351caa308ce8dfd90a40`.
+- `docker compose exec -T api id` reported `uid=999(app) gid=999(app)`.
+- `docker compose ps --all` reported API healthy on `localhost:8001`, PostgreSQL
+  healthy on `localhost:5433`, Redis healthy on `localhost:6379`, and the
+  migration job exited with status 0.
+- `docker compose config --quiet` completed successfully.
+
+## Database and endpoints
+
+- The Compose database reports Alembic revision `59888dbfdaf5` and contains
+  20 document records.
+- The Compose migration/seed job exited successfully and reported
+  `records=20 inserted=0 updated=0 unchanged=20`.
+- Integration tests create a unique PostgreSQL database for each run, apply
+  migrations, test loading records twice, and drop the database afterward.
+  The latest run left zero `homesure_test_*` databases behind.
+- `GET http://localhost:8001/health` returned `{"status":"ok"}`.
+- `GET http://localhost:8001/ready` returned
+  `{"status":"ready","checks":{"database":true}}`.
+
+## Quality checks
+
+- `uv run poe lint`: Ruff checks passed; 35 Python files were formatted.
+- `uv run poe test`: 27 passed.
+- `uv run poe test-integration`: 8 passed.
+- `uv run poe cov`: 35 passed; 100% statement and branch coverage for
+  `homesure` (230 statements, 26 branches, zero missing statements or partial
+  branches).
+
+## Remaining limitations
+
+- Integration tests and `poe cov` require a reachable PostgreSQL server and a
+  role allowed to create and drop databases. By default they use the Compose
+  PostgreSQL service; `TEST_DATABASE_URL` can select another server.
+- Redis is running as a Compose service, but the current API health/readiness
+  endpoints do not probe Redis; readiness checks PostgreSQL.

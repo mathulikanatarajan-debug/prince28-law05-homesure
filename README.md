@@ -3,7 +3,7 @@
 
 Helps home buyers check an apartment project and builder agreement against RERA rules in Tamil Nadu.
 
-**Status:** Day 1 foundation (FastAPI skeleton, quality gates). Live URL from Day 5.
+**Status:** FastAPI backend with PostgreSQL-backed document routes.
 
 ## Who it's for
 
@@ -34,29 +34,67 @@ Project health card: enter a registration number and see completion date, extens
 
 Clause checks agree with a reviewer for 85%+ of clauses in 10 agreements.
 
-## Run it locally
+## Setup
 
-```bash
-uv sync
-```
-
-Windows:
+From the repository root:
 
 ```powershell
+uv sync
 copy .env.example .env
 ```
 
-Run the server:
+Keep `.env` local; do not commit database credentials. Start the API directly with:
 
-```bash
-uv run uvicorn homesure.api.main:create_app --factory --reload
+```powershell
+uv run poe dev
 ```
 
-Then open http://localhost:8000/docs
+The local API listens on port 8000.
 
-## Checks
+## Docker Compose
 
-```bash
-uv run pytest
-uv run ruff check .
+Build and start the API, PostgreSQL, and Redis:
+
+```powershell
+docker compose up --build -d
+docker compose ps
+```
+
+Service ports:
+
+- API: http://localhost:8001
+- PostgreSQL: `localhost:5433`
+- Redis: `localhost:6379`
+
+Open the API documentation at http://localhost:8001/docs. Health is available at
+http://localhost:8001/health and database readiness at
+http://localhost:8001/ready.
+
+Stop the containers while preserving the database volume:
+
+```powershell
+docker compose down
+```
+
+## Tests and quality checks
+
+Run unit tests (no database required):
+
+```powershell
+uv run poe test
+```
+
+Integration tests and the coverage task require the Compose PostgreSQL service.
+Each integration run provisions and removes a uniquely named temporary database:
+
+```powershell
+docker compose up -d db
+uv run poe test-integration
+uv run poe cov
+```
+
+Run lint and formatting checks with:
+
+```powershell
+uv run poe lint
 ```

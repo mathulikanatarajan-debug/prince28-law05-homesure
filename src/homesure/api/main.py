@@ -14,6 +14,7 @@ from homesure.api.logging_setup import setup_logging
 from homesure.api.middleware import request_id_middleware
 from homesure.api.routes import documents, health
 from homesure.config import Settings, get_settings
+from homesure.db.session import make_engine, make_sessionmaker
 
 logger = logging.getLogger(__name__)
 
@@ -25,13 +26,21 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
     @asynccontextmanager
     async def lifespan(app: FastAPI) -> AsyncIterator[None]:
+        engine = make_engine(settings)
+        app.state.engine = engine
+        app.state.session_factory = make_sessionmaker(engine)
+
         try:
-            with settings.data_file.open(encoding="utf-8") as file:
-                app.state.documents = json.load(file)
-        except (OSError, json.JSONDecodeError):
-            app.state.documents = None
-            logger.exception("Could not load records from %s", settings.data_file)
-        yield
+            try:
+                with settings.data_file.open(encoding="utf-8") as file:
+                    app.state.documents = json.load(file)
+            except (OSError, json.JSONDecodeError):
+                app.state.documents = None
+                logger.exception("Could not load records from %s", settings.data_file)
+
+            yield
+        finally:
+            await engine.dispose()
 
     app = FastAPI(title=settings.app_name, lifespan=lifespan)
 
@@ -41,8 +50,12 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(documents.router)
 
     @app.exception_handler(StarletteHTTPException)
-    async def http_exception_handler(request: Request, exc: StarletteHTTPException) -> JSONResponse:
+    async def http_exception_handler(
+        request: Request,
+        exc: StarletteHTTPException,
+    ) -> JSONResponse:
         title = "Not Found" if exc.status_code == 404 else "HTTP Error"
+
         return JSONResponse(
             status_code=exc.status_code,
             media_type="application/problem+json",
@@ -57,7 +70,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
     @app.exception_handler(RequestValidationError)
     async def validation_exception_handler(
-        request: Request, exc: RequestValidationError
+        request: Request,
+        exc: RequestValidationError,
     ) -> JSONResponse:
         errors = [
             {
@@ -66,6 +80,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             }
             for error in exc.errors()
         ]
+
         return JSONResponse(
             status_code=422,
             media_type="application/problem+json",

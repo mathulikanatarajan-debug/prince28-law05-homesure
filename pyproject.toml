@@ -1,4 +1,5 @@
 
+
 [project]
 name = "homesure"
 version = "0.1.0"
@@ -24,8 +25,11 @@ build-backend = "uv_build"
 [dependency-groups]
 dev = [
     "httpx>=0.28.1",
+    "poethepoet>=0.49.0",
     "pre-commit>=4.7.0",
     "pytest>=9.2.0",
+    "pytest-asyncio>=1.5.0",
+    "pytest-cov>=7.1.0",
     "ruff>=0.17.5",
 ]
 
@@ -40,5 +44,32 @@ ignore = ["E402"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-q"
-# Harmless notice from newer Starlette versions; hide it so real warnings stand out.
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
 filterwarnings = ["ignore:Using `httpx` with `starlette.testclient`"]
+
+[tool.coverage.run]
+source = ["homesure"]
+branch = true
+
+[tool.coverage.report]
+show_missing = true
+
+[tool.poe.tasks]
+dev = "uvicorn homesure.api.main:create_app --factory --reload --no-access-log"
+lint = ["_ruff_check", "_ruff_format"]
+_ruff_check = "ruff check ."
+_ruff_format = "ruff format --check ."
+test = "pytest tests/unit"
+migrate = "alembic upgrade head"
+seed = "python scripts/load_db.py"
+
+[tool.poe.tasks.cov]
+help = "Run unit and integration tests with branch coverage for homesure"
+cmd = "pytest tests/unit tests/integration --cov=homesure --cov-branch --cov-report=term-missing"
+env.TEST_DATABASE_URL.default = "postgresql://app:app@localhost:5433/app" # pragma: allowlist secret
+
+[tool.poe.tasks.test-integration]
+help = "Integration tests using a disposable database on the Compose Postgres server"
+cmd = "pytest tests/integration"
+env.TEST_DATABASE_URL.default = "postgresql://app:app@localhost:5433/app" # pragma: allowlist secret
