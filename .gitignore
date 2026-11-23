@@ -19,3 +19,6 @@ data/raw/
 .vscode/
 .idea/
 .DS_Store
+
+test-output.txt
+unit-errors.txt
