@@ -151,3 +151,16 @@ uv run poe lint
 ```bash
 docker compose down
 ```
+
+## Live deployment
+
+**Live API:** https://homesure-api.onrender.com
+
+**Health:** https://homesure-api.onrender.com/health
+
+**Readiness:** https://homesure-api.onrender.com/ready
+
+## GitHub Actions
+
+![CI](https://github.com/mathulikanatarajan-debug/prince28-law05-homesure/actions/workflows/ci.yml/badge.svg?branch=main)
+![CD](https://github.com/mathulikanatarajan-debug/prince28-law05-homesure/actions/workflows/cd.yml/badge.svg?branch=main)
