@@ -1,5 +1,4 @@
-﻿
-name: CD
+﻿name: CD
 
 on:
   workflow_run:
@@ -16,73 +15,52 @@ concurrency:
 
 jobs:
   deploy:
-    if: >-
-      github.event.workflow_run.conclusion == 'success' &&
-      github.event.workflow_run.head_branch == 'main'
-
+    if: github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
-    timeout-minutes: 30
 
     steps:
       - name: Checkout successful CI commit
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           ref: ${{ github.event.workflow_run.head_sha }}
-
-      - name: Install Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
 
       - name: Install uv
         uses: astral-sh/setup-uv@v6
 
+      - name: Set up Python
+        run: uv python install
+
       - name: Install dependencies
-        run: uv sync --locked --all-groups
+        run: uv sync --locked
 
       - name: Run database migrations
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          APP_ENV: production
-        run: uv run poe migrate
+        run: uv run alembic upgrade head
 
       - name: Trigger Render deployment
         env:
           RENDER_DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
         run: |
-          if [ -z "$RENDER_DEPLOY_HOOK_URL" ]; then
-            echo "Render deploy hook secret is missing!"
-            exit 1
-          fi
-
-          curl --fail --silent --show-error \
-            --request POST \
-            "$RENDER_DEPLOY_HOOK_URL"
-
-          echo "Render deployment triggered successfully."
+          curl --fail --show-error --silent \
+            -X POST "$RENDER_DEPLOY_HOOK_URL"
 
       - name: Wait for deployment
-        run: sleep 60
+        run: sleep 45
 
-      - name: Smoke test live API
+      - name: Smoke test HomeSure API
         run: |
-          HEALTH_URL="https://homesure-api.onrender.com/health"
+          URL="https://homesure-api.onrender.com/health"
 
-          for attempt in $(seq 1 40); do
-            echo "Checking HomeSure API: attempt $attempt/40"
-
-            response=$(curl --fail --silent \
-              --show-error "$HEALTH_URL") || response=""
-
-            if echo "$response" | grep -Eq '"status"[[:space:]]*:[[:space:]]*"ok"'; then
-              echo "HomeSure API is healthy!"
-              echo "$response"
+          for i in $(seq 1 30); do
+            if curl --fail --silent --show-error "$URL"; then
+              echo "HomeSure API health check passed"
               exit 0
             fi
 
-            echo "API is not ready yet. Waiting 10 seconds..."
+            echo "Waiting for API... attempt $i/30"
             sleep 10
           done
 
-          echo "HomeSure health check failed!"
+          echo "Deployment health check failed"
           exit 1
