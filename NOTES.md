@@ -41,3 +41,16 @@
   PostgreSQL service; `TEST_DATABASE_URL` can select another server.
 - Redis is running as a Compose service, but the current API health/readiness
   endpoints do not probe Redis; readiness checks PostgreSQL.
+
+## D05 – HomeSure Production Rollback Drill
+
+- Service: homesure-api
+- Platform: Render
+- Rollback performed: Yes
+- Render status: Live
+- Commit after rollback: 4a79e0b
+- Auto-deploy: Disabled by Render
+- Post-rollback health check: HTTP 200 – Passed
+- Post-rollback readiness check: HTTP 200 – Passed
+- PostgreSQL connectivity: Passed
+- Result: Rollback successful; API and database readiness verified.
