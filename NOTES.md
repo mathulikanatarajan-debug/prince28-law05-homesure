@@ -54,3 +54,38 @@
 - Post-rollback readiness check: HTTP 200 – Passed
 - PostgreSQL connectivity: Passed
 - Result: Rollback successful; API and database readiness verified.
+
+## D07 - PDF Parser Comparison
+
+### Test corpus
+
+- PDF files tested: 6
+- Total pages processed: 96
+- Parsers compared: PyMuPDF and pypdf
+- Both parsers completed all six files without reported errors.
+
+### Comparison results
+
+| PDF | Pages | PyMuPDF headings | PyMuPDF tables | pypdf headings | pypdf tables |
+|---|---:|---:|---:|---:|---:|
+| 17gg99 | 34 | 67 | 0 | 0 | 0 |
+| 188-ex | 55 | 109 | 18 | 0 | 0 |
+| 448-ex | 2 | 3 | 0 | 0 | 0 |
+| 452-ex | 1 | 0 | 0 | 0 | 0 |
+| 481-ex | 1 | 0 | 1 | 0 | 0 |
+| Circular 1483 | 3 | 0 | 0 | 0 | 0 |
+| **Total** | **96** | **179** | **19** | **0** | **0** |
+
+### Observations
+
+- Both parsers extracted text from all six PDFs.
+- PyMuPDF detected 179 headings and 19 tables across the corpus.
+- pypdf did not detect headings or tables in this test corpus.
+- PyMuPDF provides richer structural extraction for these documents.
+- Detection counts do not guarantee that every extracted heading or table is semantically correct; manual validation is still required.
+
+### Decision
+
+- Selected PyMuPDF as the primary PDF parser because it provides heading detection and table extraction in addition to page-level text.
+- Retained pypdf as a comparison and potential fallback parser.
+- Parser comparison completed successfully on the available six-PDF corpus.

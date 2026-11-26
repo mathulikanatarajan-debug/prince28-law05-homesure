@@ -60,7 +60,7 @@ async def test_migrations_created_schema_at_head(db_session):
     documents_table = await db_session.scalar(text("SELECT to_regclass('public.documents')"))
     pages_table = await db_session.scalar(text("SELECT to_regclass('public.pages')"))
 
-    assert revision == "59888dbfdaf5"
+    assert revision == "8127537c4076"
     assert documents_table == "documents"
     assert pages_table == "pages"
 
